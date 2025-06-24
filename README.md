@@ -1,46 +1,112 @@
-![Banner image](https://user-images.githubusercontent.com/10284570/173569848-c624317f-42b1-45a6-ab09-f0ea3c247648.png)
+# n8n-nodes-businessmap
 
-# n8n-nodes-starter
+This is the official n8n community node working with the [Businessmap API](https://demo.businessmap.io/openapi/). 
 
-This repo contains example nodes to help you get started building your own custom integrations for [n8n](n8n.io). It includes the node linter and other dependencies.
+**Businessmap** is the most flexible software platform for outcomes-driven enterprise agility. The unmatched functionality consolidates multiple tools into one, enabling affordable deployment at scale, visibility across all projects/portfolios, and alignment on goals, to deliver quality work faster. 
 
-To make your custom node available to the community, you must create it as an npm package, and [submit it to the npm registry](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry).
 
-## Prerequisites
+[n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
-You need the following installed on your development machine:
+[Installation](#installation)  
+[Operations](#operations)  
+[Credentials](#credentials)
+[Compatibility](#compatibility)  
+[Usage](#usage)
+[Resources](#resources)  
 
-* [git](https://git-scm.com/downloads)
-* Node.js and pnpm. Minimum version Node 20. You can find instructions on how to install both using nvm (Node Version Manager) for Linux, Mac, and WSL [here](https://github.com/nvm-sh/nvm). For Windows users, refer to Microsoft's guide to [Install NodeJS on Windows](https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows).
-* Install n8n with:
-  ```
-  npm install n8n -g
-  ```
-* Recommended: follow n8n's guide to [set up your development environment](https://docs.n8n.io/integrations/creating-nodes/build/node-development-environment/).
+## Installation
 
-## Using this starter
+Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
-These are the basic steps for working with the starter. For detailed guidance on creating and publishing nodes, refer to the [documentation](https://docs.n8n.io/integrations/creating-nodes/).
+## Operations
 
-1. [Generate a new repository](https://github.com/n8n-io/n8n-nodes-starter/generate) from this template repository.
-2. Clone your new repo:
-   ```
-   git clone https://github.com/<your organization>/<your-repo-name>.git
-   ```
-3. Run `npm i` to install dependencies.
-4. Open the project in your editor.
-5. Browse the examples in `/nodes` and `/credentials`. Modify the examples, or replace them with your own nodes.
-6. Update the `package.json` to match your details.
-7. Run `npm lint` to check for errors or `npm lintfix` to automatically fix errors when possible.
-8. Test your node locally. Refer to [Run your node locally](https://docs.n8n.io/integrations/creating-nodes/test/run-node-locally/) for guidance.
-9. Replace this README with documentation for your node. Use the [README_TEMPLATE](README_TEMPLATE.md) to get started.
-10. Update the LICENSE file to use your details.
-11. [Publish](https://docs.npmjs.com/packages-and-modules/contributing-packages-to-the-registry) your package to npm.
+### Supported Triggers
+The **Businessmap n8n community node** supports the following triggers:
+* `All Events`
+* `Card Created`
+* `Card Details Changed`
+* `Card Discarded`
+* `Card Restored`
+* `Card Moved`
+* `Card Archived`
+* `Card Is Unarchived`
+* `Comment Created`
+* `Comment Updated`
+* `Comment Deleted`
+* `Subtask Created`
+* `Subtask Updated`
+* `Subtask Deleted`
+* `Board Renamed`
+* `Board Archived`
+* `Board Unarchived`
+* `Board Deleted`
+* `Board Structure Changed`
 
-## More information
+### Supported Actions
+The **Businessmap n8n community node** supports the following actions:
+* `Create Card`: Create a card in a board of your choice. Set card details including custom fields, stickers and tags.
+* `Update Card`: Update the properties of a card (Title, Description, Priority, Size, Deadline, etc.).
+* `Move Card`: Move a card to a new column, lane or board.
+* `Get Card by ID`: Get the details of a card by its internal ID.
+* `Get Card by Custom Card ID`: Find card by custom card ID. If multiple cards are found, all will be returned. Use "Board" parameter to filter search by boards.
+* `Get All Cards Per Board`: Get all cards from a selected board. The response contains up to 200 cards. To retrieve more than 200 cards, please use pagination.
+* `Link Card`: Link a card to an existing card.
+* `Unlink Card`: Remove a link between two cards.
+* `Set Custom Fields`: Sets values of custom fields.
+* `Block Card`: Block a card.
+* `Unblock Card`: Unblock a card.
+* `Archive Card`: Add card to archive.
+* `Unarchive Card`: Extract card from archive.
+* `Discard Card`: Discard a card.
+* `Restore Card`: Restore a previously discarded card.
+* `Add Comment`: Add a comment to a card.
+* `Create Subtask`: Create a new subtask of a card.
+* `Log Time`: Log time to a card.
+* `Upload Attachment`: Upload an attachment to a card.
+* `Download Attachment`: Download an attachment from a card.
+* `Get Card Attachments`: Get a list with all attachments for a specified card.
+* `Create Workspace`: Create a workspace.
+* `Update Workspace`: Update a workspace.
+* `Get Workspace`: Get a workspace.
+* `Get All Workspaces`: Get a list with all workspaces in the account.
+* `Create Board`: Create a board.
+* `Update Board`: Update a board.
+* `Get Board`: Get a board.
+* `Get All Boards`: Get a list with all boards.
+* `Get Board Structure`: Get board structure which includes all workflows, lanes and columns.
+* `Create Tag`: Create a tag.
+* `Update Tag`: Update a tag.
+* `Delete Tag`: Delete a tag.
+* `Get Tag`: Get a tag.
+* `Get All Tags`: Get a list with all tags.
+* `Assign Tag`: Assign a tag to a board.
+* `Create Sticker`: Create a sticker.
+* `Update Sticker`: Update a sticker.
+* `Delete Sticker`: Delete a sticker.
+* `Get Sticker`: Get a sticker.
+* `Get All Stickers`: Get a list with all stickers.
+* `Assign Sticker`: Assign a sticker to a board.
 
-Refer to our [documentation on creating nodes](https://docs.n8n.io/integrations/creating-nodes/) for detailed information on building your own nodes.
 
-## License
+## Credentials
 
-[MIT](https://github.com/n8n-io/n8n-nodes-starter/blob/master/LICENSE.md)
+* To use this **n8n community node**, you'll need a **Businessmap** account and a user with permissions to access the API. If you don’t have an account yet, [sign up here](https://businessmap.io/sign-up) to get started.
+
+To authenticate with the Businessmap API, you'll need to provide your domain name and API key when setting up your credentials. Follow the instructions provided on the [Businessmap API page](https://businessmap.io/api) to obtain your API key.
+
+## Compatibility
+
+Requires n8n version 1.0.0 or later
+Requires Node.js 20.15.0 or later
+
+## Usage
+
+* Visit our [Knowledge Base](https://knowledgebase.businessmap.io/hc/en-us) to find answers to all your questions regarding Businessmap.
+* Contact our [customer support](https://businessmap.io/customer-support) with any specific request.
+
+## Resources
+
+* [n8n community nodes documentation](https://docs.n8n.io/integrations/builtin/app-nodes/)
+* [Create Businessmap Account](https://businessmap.io/sign-up)
+* [Knowledge Base](https://knowledgebase.businessmap.io/hc/en-us)
+* [Businessmap API documentation](https://demo.businessmap.io/openapi/#/)
