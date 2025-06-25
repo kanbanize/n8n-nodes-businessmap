@@ -10,7 +10,7 @@ export class Businessmap extends VersionedNodeType {
 			name: 'businessmap',
 			icon: 'file:businessmap.svg',
 			group: ['input'],
-			description: 'Read, update, write and delete data from Businessmap',
+			description: 'Read, write, update and delete data from Businessmap',
 			defaultVersion: 1.0,
 		};
 

@@ -35,7 +35,7 @@ export async function getBoardDependentItems(this: ILoadOptionsFunctions, params
     returnLabel,
   } = params;
 
-  // If the user hasn’t picked a board yet, return an empty list
+  // Board is required. Return error if it is missing
   if (!boardId) {
 		throw new NodeOperationError(
 			this.getNode(),
@@ -44,7 +44,7 @@ export async function getBoardDependentItems(this: ILoadOptionsFunctions, params
 		)
   }
 
-  // 2) fetch the list of reason IDs for this board
+  // 2) fetch the list of items for this board
   const idResponse = await businessmapApiRequest.call(
     this,
     'GET',
@@ -61,7 +61,7 @@ export async function getBoardDependentItems(this: ILoadOptionsFunctions, params
     return [];
   }
 
-  // 4) fetch full reason objects
+  // 4) fetch list with full objects details
   const fullResponse = await businessmapApiRequest.call(
     this,
     'GET',

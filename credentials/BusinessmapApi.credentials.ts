@@ -8,7 +8,7 @@ import {
 export class BusinessmapApi implements ICredentialType {
 	name = 'businessmapApi';
 	displayName = 'Businessmap API';
-	documentationUrl = 'https://knowledgebase.businessmap.io/hc/en-us/sections/115000974005-Integrations';
+	documentationUrl = 'https://businessmap.io/api';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Businessmap URL',
@@ -16,7 +16,7 @@ export class BusinessmapApi implements ICredentialType {
 			type: 'string',
 			required: true,
 			default: '',
-			placeholder: 'https://<your-subdomain>.businessmap.io',
+			placeholder: 'e.g. https://<your-subdomain>.businessmap.io',
 			description: 'Must be a valid URL: https://<subdomain>.businessmap.io or https://<subdomain>.kanbanize.com',
 		},
 		{
@@ -25,12 +25,13 @@ export class BusinessmapApi implements ICredentialType {
 			type: 'string',
 			default: '',
 			required: true,
+			placeholder: 'e.g. Your API key',
 			typeOptions: {
 				password: true,
 			},
 		},
 		{
-			displayName: 'Please configure your Businessmap URL and API key.<br> <a href="https://solutions.businessmap.io/slackLogins" target="_blank">How to get connection settings?</a>',
+			displayName: 'Please configure your Businessmap URL and API key.<br> <a href="https://solutions.businessmap.io/apiLogins/logins" target="_blank">How to get connection settings?</a>',
 			name: 'notice',
 			type: 'notice',
 			default: '',

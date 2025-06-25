@@ -1,9 +1,14 @@
 {
   "name": "n8n-nodes-businessmap",
   "version": "0.1.0",
-  "description": "Node to connect to Businessmap",
+  "description": "Facilitates interaction with Businessmap's REST API for CRUD operations on boards, cards and workflow artifacts across enterprise environments.",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package",
+    "businessmap integration",
+    "enterprise agility",
+    "project portfolio management",
+    "outcomes-driven planning",
+    "agile workflow automation"
   ],
   "license": "MIT",
   "homepage": "https://businessmap.io/",
