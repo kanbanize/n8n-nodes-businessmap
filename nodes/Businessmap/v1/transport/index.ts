@@ -28,6 +28,7 @@ export async function businessmapApiRequest(
     method,
     headers: {
       apikey: credentials.apikey,
+			'kanbanize-integration': 'n8n'
     },
     qs,
     body,

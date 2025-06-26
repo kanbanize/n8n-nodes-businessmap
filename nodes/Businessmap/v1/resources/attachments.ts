@@ -5,6 +5,7 @@ import type {
 } from 'n8n-workflow';
 import { IResourceHandler } from '../types';
 import { NodeApiError, NodeOperationError, BINARY_ENCODING } from 'n8n-workflow';
+import type { Readable } from 'stream';
 
 import { businessmapApiRequest, } from '../transport';
 //import { checkApiResponse } from '../helpers/utils';
@@ -179,6 +180,7 @@ export const attachmentHandlers: IResourceHandler = {
 				encoding: 'arraybuffer',
 				headers: {
 					apikey: credentials.apikey,
+					'kanbanize-integration': 'n8n',
 				},
 			});
 		} catch (error) {
@@ -219,7 +221,7 @@ export const attachmentHandlers: IResourceHandler = {
 			}
 
 			const binaryData = this.helpers.assertBinaryData(itemIndex, binaryPropertyName);
-			const FormData = require('form-data');
+			// Create FormData object using the native FormData API
 			const form = new FormData();
 
 			// Add CSRF token
@@ -232,21 +234,25 @@ export const attachmentHandlers: IResourceHandler = {
 			}
 			form.append('ci_csrf_token', csrfToken);
 
+			const filename = this.getNodeParameter('filename', itemIndex) as string || binaryPropertyName;
 			// Add file with proper formatting
 			if (binaryData.id) {
 					// Stream approach
 					const stream = await this.helpers.getBinaryStream(binaryData.id, UPLOAD_CHUNK_SIZE);
 					const metadata = await this.helpers.getBinaryMetadata(binaryData.id);
-					form.append('files[]', stream, {
-							filename: this.getNodeParameter('filename', itemIndex) as string || binaryPropertyName,
-							contentType: metadata.mimeType ?? binaryData.mimeType,
-							knownLength: metadata.fileSize // Helps with proper Content-Length
-					});
+					form.append('files[]', new Blob([await streamToBuffer(stream)], {	type: metadata.mimeType ?? binaryData.mimeType }), filename);
 			} else {
 					// Buffer approach
-					form.append('files[]', Buffer.from(binaryData.data, BINARY_ENCODING), {
-							filename: this.getNodeParameter('filename', itemIndex) as string || binaryPropertyName,
-							contentType: binaryData.mimeType
+					form.append('files[]', new Blob([Buffer.from(binaryData.data, BINARY_ENCODING)], {type: binaryData.mimeType}), filename);
+			}
+
+			// Helper function to convert stream to buffer
+			async function streamToBuffer(stream: Readable): Promise<Buffer> {
+					return new Promise((resolve, reject) => {
+							const chunks: Buffer[] = [];
+							stream.on('data', (chunk) => chunks.push(chunk));
+							stream.on('error', reject);
+							stream.on('end', () => resolve(Buffer.concat(chunks)));
 					});
 			}
 
@@ -257,9 +263,9 @@ export const attachmentHandlers: IResourceHandler = {
 			const fileUploadUrl = `${credentials.subdomain.replace(/\/$/, '')}/files`;
 
 			const headers = {
-					...form.getHeaders(),
 					'Cookie': `ci_csrf_token=${csrfToken}`,
-					'apikey': credentials.apikey
+					'apikey': credentials.apikey,
+					'kanbanize-integration': 'n8n',
 			};
 
 			let parsedResponse: {
