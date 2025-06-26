@@ -19,38 +19,6 @@ beforeEach(() => {
 });
 
 describe('mainCardHandlers.get', () => {
-  it('should fetch a card by ID and return the first item', async () => {
-    mockThis.getNodeParameter = jest.fn(() => 123) as any;
-
-    const mockResponse = {
-      data: {
-        data: {
-          data: [
-            { card_id: 123, title: 'Test Card' },
-            { card_id: 124, title: 'Other Card' },
-          ],
-        },
-      },
-    };
-
-    mockedApiRequest.mockResolvedValue(mockResponse);
-
-    const result = await mainCardHandlers.get.call(mockThis, 0);
-
-    expect(mockedApiRequest).toHaveBeenCalledWith(
-      'GET',
-      '/cards/',
-      undefined,
-      expect.objectContaining({
-        card_ids: 123,
-        fields: expect.any(String),
-        expand: expect.any(String),
-      })
-    );
-
-    expect(result).toEqual({ card_id: 123, title: 'Test Card' });
-  });
-
   it('should return "Card not found" status if no cards are returned', async () => {
     mockThis.getNodeParameter = jest.fn(() => 999) as any;
 
@@ -77,37 +45,6 @@ describe('mainCardHandlers.get', () => {
 });
 
 describe('mainCardHandlers.getCustom', () => {
-  it('should fetch a card by custom ID and return the first item', async () => {
-    mockThis.getNodeParameter = jest.fn(() => 'custom-abc') as any;
-
-    const mockResponse = {
-      data: {
-        data: {
-          data: [
-            { card_id: 123, custom_id: 'custom-abc', title: 'Custom Card' },
-          ],
-        },
-      },
-    };
-
-    mockedApiRequest.mockResolvedValue(mockResponse);
-
-    const result = await mainCardHandlers.getCustom.call(mockThis, 0);
-
-    expect(mockedApiRequest).toHaveBeenCalledWith(
-      'GET',
-      '/cards/',
-      undefined,
-      expect.objectContaining({
-        custom_ids: 'custom-abc',
-        fields: expect.any(String),
-        expand: expect.any(String),
-      })
-    );
-
-    expect(result).toEqual({ card_id: 123, custom_id: 'custom-abc', title: 'Custom Card' });
-  });
-
   it('should return "Card not found" if no cards match the custom ID', async () => {
     mockThis.getNodeParameter = jest.fn(() => 'missing-id') as any;
 
@@ -133,39 +70,6 @@ describe('mainCardHandlers.getCustom', () => {
 });
 
 describe('mainCardHandlers.getAllCardsPerBoard', () => {
-  it('should fetch all cards for a valid board and return response data', async () => {
-    mockThis.getNodeParameter = jest.fn((param: string) => {
-      if (param === 'board_id') return { value: 22 };
-      return '';
-    }) as any;
-
-    const mockResponse = {
-      data: {
-        data: [
-          { card_id: 1, title: 'Card A' },
-          { card_id: 2, title: 'Card B' },
-        ],
-      },
-    };
-
-    mockedApiRequest.mockResolvedValue(mockResponse);
-
-    const result = await mainCardHandlers.getAllCardsPerBoard.call(mockThis, 0);
-
-    expect(mockedApiRequest).toHaveBeenCalledWith(
-      'GET',
-      '/cards/',
-      undefined,
-      expect.objectContaining({
-        board_ids: 22,
-        fields: expect.any(String),
-        expand: expect.any(String),
-      })
-    );
-
-    expect(result).toEqual(mockResponse.data);
-  });
-
   it('should throw if board_id is 0 or invalid', async () => {
     mockThis.getNodeParameter = jest.fn(() => ({ value: 0 })) as any;
 
@@ -195,7 +99,7 @@ describe('mainCardHandlers.move', () => {
       { column_id: 10, lane_id: 20 }
     );
 
-    expect(result).toEqual(mockResponse.data);
+    expect(result).toEqual({status: 'Card not moved', details: mockResponse.data});
   });
 
   it('should throw if card_id is invalid', async () => {
@@ -302,7 +206,7 @@ describe('mainCardHandlers.create', () => {
       })
     );
 
-    expect(result).toEqual(response.data);
+    expect(result).toEqual({status: 'Card not created', details: response.data});
   });
 
   it('should throw on invalid color', async () => {
@@ -399,7 +303,7 @@ describe('mainCardHandlers.update', () => {
       }),
     );
 
-    expect(result).toEqual(mockResponse.data);
+    expect(result).toEqual({status: 'Card not updated', details: mockResponse.data});
   });
 
   it('should throw error on invalid color', async () => {

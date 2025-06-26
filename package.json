@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-businessmap",
   "version": "0.1.0",
-  "description": "Facilitates interaction with Businessmap's REST API for CRUD operations on boards, cards and workflow artifacts across enterprise environments.",
+  "description": "An n8n community node package that integrates with Businessmap's REST API for CRUD operations on boards, cards and workflow artifacts across enterprise environments.",
   "keywords": [
     "n8n-community-node-package",
     "businessmap integration",

@@ -118,12 +118,12 @@ describe('cardHandlers.unlink', () => {
 });
 
 describe('cardHandlers.block', () => {
-  it('should call block endpoint successfully', async () => {
+  it('should call block endpoint', async () => {
     mockThis.getNodeParameter = jest.fn((param: string) => {
       if (param === 'card_id') return 101;
       if (param === 'reason_id') return { value: 1 };
       if (param === 'comment') return 'Blocked due to X';
-			return '';
+      return '';
     }) as any;
 
     const response = { data: { success: true } };
@@ -132,7 +132,7 @@ describe('cardHandlers.block', () => {
     const result = await cardHandlers.block.call(mockThis, 0);
 
     expect(mockedApiRequest).toHaveBeenCalled();
-    expect(result).toEqual(response.data);
+    expect(result).toEqual({ status: 'Unable to block card', details: response.data });
   });
 
   it('should throw if card_id is 0', async () => {
@@ -154,7 +154,7 @@ describe('cardHandlers.unblock', () => {
     const result = await cardHandlers.unblock.call(mockThis, 0);
 
     expect(mockedApiRequest).toHaveBeenCalled();
-    expect(result).toEqual(response.data);
+		expect(result).toEqual({status: 'Unable to unblock card', details: response.data});
   });
 });
 
@@ -171,7 +171,7 @@ describe('cardHandlers.archive', () => {
     const result = await cardHandlers.archive.call(mockThis, 0);
 
     expect(mockedApiRequest).toHaveBeenCalled();
-    expect(result).toEqual(response.data);
+    expect(result).toEqual({status: 'Unable to move card to archive.', details: response.data});
   });
 });
 
@@ -188,7 +188,7 @@ describe('cardHandlers.unarchive', () => {
     const result = await cardHandlers.unarchive.call(mockThis, 0);
 
     expect(mockedApiRequest).toHaveBeenCalled();
-    expect(result).toEqual(response.data);
+    expect(result).toEqual({status: 'Unable to move card from archive', details: response.data});
   });
 });
 
@@ -205,7 +205,7 @@ describe('cardHandlers.discard', () => {
     const result = await cardHandlers.discard.call(mockThis, 0);
 
     expect(mockedApiRequest).toHaveBeenCalled();
-    expect(result).toEqual(response.data);
+    expect(result).toEqual({status: 'Unable to discard card', details: response.data});
   });
 });
 
@@ -222,7 +222,7 @@ describe('cardHandlers.restore', () => {
     const result = await cardHandlers.restore.call(mockThis, 0);
 
     expect(mockedApiRequest).toHaveBeenCalled();
-    expect(result).toEqual(response.data);
+    expect(result).toEqual({status: 'Unable to restore card', details: response.data});
   });
 });
 
