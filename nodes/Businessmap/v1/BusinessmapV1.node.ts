@@ -15,7 +15,7 @@ export class BusinessmapV1 implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Businessmap',
 		name: 'businessmap',
-		icon: 'file:../businessmap.svg',
+		icon: 'file:businessmap.svg',
 		group: ['output'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
