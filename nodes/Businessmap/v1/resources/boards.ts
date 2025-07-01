@@ -258,7 +258,7 @@ export const boardHandlers: IResourceHandler = {
 		const isArchived = archived?.value;
 
     if (name) body.name = name;
-    if (isArchived) body.is_archived = isArchived;
+    if (isArchived === 0 || isArchived === 1) body.is_archived = isArchived;
 
     const response = await businessmapApiRequest.call(
       this,

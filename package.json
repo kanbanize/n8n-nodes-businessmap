@@ -41,7 +41,8 @@
       "dist/credentials/BusinessmapApi.credentials.js"
     ],
     "nodes": [
-      "dist/nodes/Businessmap/Businessmap.node.js"
+      "dist/nodes/Businessmap/Businessmap.node.js",
+      "dist/nodes/Businessmap/BusinessmapTrigger.node.js"
     ]
   },
   "devDependencies": {
