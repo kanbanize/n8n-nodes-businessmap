@@ -36,6 +36,7 @@ export async function getWorkspaceBoards(this: ILoadOptionsFunctions): Promise<I
     this,
     'GET',
     '/boards',
+		undefined,
     { workspace_ids: workspaceId, is_archived: 0 },
   );
 
@@ -54,6 +55,7 @@ export async function getBoards(this: ILoadOptionsFunctions): Promise<INodePrope
     this,
     'GET',
     '/boards',
+		undefined,
 		{is_archived: 0}
   );
 
