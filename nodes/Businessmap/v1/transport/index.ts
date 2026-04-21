@@ -48,13 +48,22 @@ export async function businessmapApiRequest(
 
     // pull out raw text (HTML or whatever)
     const raw = response.body as string;
+    const rawStr = raw === undefined || raw === null ? '' : String(raw);
+    const trimmed = rawStr.trim();
 
-    // if it *is* JSON, parse it (or else leave it)
+    // Empty bodies (e.g. 204 DELETE) must not become JSON `null`, or n8n output helpers break on null items.
     let data: any;
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      data = null;
+    if (!trimmed) {
+      data = {};
+    } else {
+      try {
+        data = JSON.parse(trimmed);
+      } catch {
+        data = null;
+      }
+    }
+    if (data === null || data === undefined) {
+      data = {};
     }
 
     if (response.statusCode !== 200 && response.statusCode !== 204) {

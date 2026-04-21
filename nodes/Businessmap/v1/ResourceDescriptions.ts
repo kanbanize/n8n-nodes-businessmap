@@ -7,6 +7,7 @@ import { workspacesOperations, workspacesFields } from './resources/workspaces';
 import { boardsOperations, boardsFields } from './resources/boards';
 import { tagsOperations, tagsFields } from './resources/tags';
 import { stickersOperations, stickersFields } from './resources/stickers';
+import { documentsOperations, documentsFields } from './resources/documents';
 
 export const resourceOperations: INodeProperties[] = [
 	...mainCardOperations,
@@ -16,6 +17,7 @@ export const resourceOperations: INodeProperties[] = [
 	...boardsOperations,
 	...tagsOperations,
 	...stickersOperations,
+	...documentsOperations,
 ];
 
 export const resourceFields: INodeProperties[] = [
@@ -26,5 +28,6 @@ export const resourceFields: INodeProperties[] = [
 	...boardsFields,
 	...tagsFields,
 	...stickersFields,
+	...documentsFields,
 ];
 

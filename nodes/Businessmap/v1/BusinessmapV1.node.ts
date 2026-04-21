@@ -77,6 +77,11 @@ export class BusinessmapV1 implements INodeType {
 						value: 'stickers',
 						description: 'All sticker related actions'
 					},
+					{
+						name: 'Documents',
+						value: 'documents',
+						description: 'All document related actions'
+					}
 				],
 				default: 'mainCard',
 			},
