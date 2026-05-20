@@ -1411,18 +1411,33 @@ export const mainCardHandlers: IResourceHandler = {
 			throw new NodeOperationError(this.getNode(), `Card ID must be a positive number`, {level: 'warning',});
 		}
 
+		const qs: IDataObject = {};
+		qs.card_ids = cardIdentifier;
+
+		const { fields, expand } = getSelectedFields.call(this, itemIndex);
+		if (fields !== '') {
+			qs.fields = fields;
+		}
+		if (expand !== '') {
+			qs.expand = expand;
+		}
+
 		const response = await businessmapApiRequest.call(
 			this,
 			'GET',
-			`/cards/${cardIdentifier}`,
+			`/cards/`,
 			undefined,
+			qs,
 		);
 
-		const item = response.data?.data;
-		if (item && typeof item === 'object' && !Array.isArray(item)) {
-			return formatCardOutput.call(this, [item], itemIndex);
+		// pull out the parsed JSON (response.data.data) and then its data array
+		// First `data` is from businessmapApiRequest, second is from Businessmap main `data` and third `data` are the actual cards
+		const items = response.data?.data?.data;
+		if (Array.isArray(items) && items.length > 0) {
+			return formatCardOutput.call(this, items, itemIndex);
 		}
 
+		// 4) nothing found → return an empty object
 		return {status: 'Card not found'};
 	},
 
