@@ -7,7 +7,7 @@ import type {
 	INodeTypeDescription,
 	IWebhookResponseData,
 } from 'n8n-workflow';
-import { NodeConnectionType, NodeApiError, } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeApiError, } from 'n8n-workflow';
 
 import { businessmapApiRequest } from './v1/transport';
 import { loadOptions } from './v1/methods';
@@ -32,7 +32,7 @@ export class BusinessmapTrigger implements INodeType {
 			name: 'Businessmap Trigger',
 		},
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				displayName: 'Credentials to Connect to Businessmap',
