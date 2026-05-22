@@ -165,7 +165,6 @@ export const attachmentHandlers: IResourceHandler = {
 		}
 
 		const credentials = await this.getCredentials('businessmapApi') as {
-			apikey: string;
 			subdomain: string;
 		};
 
@@ -174,12 +173,11 @@ export const attachmentHandlers: IResourceHandler = {
 		// 4) Download binary file to buffer
 		let binaryData: Buffer;
 		try {
-			binaryData = await this.helpers.httpRequest.call(this, {
+			binaryData = await this.helpers.httpRequestWithAuthentication.call(this, 'businessmapApi', {
 				method:   'GET',
 				url:      fileUrl,
 				encoding: 'arraybuffer',
 				headers: {
-					apikey: credentials.apikey,
 					'kanbanize-integration': 'n8n',
 				},
 			});
@@ -257,14 +255,12 @@ export const attachmentHandlers: IResourceHandler = {
 			}
 
 			const credentials = await this.getCredentials('businessmapApi') as {
-					apikey: string;
 					subdomain: string;
 			};
 			const fileUploadUrl = `${credentials.subdomain.replace(/\/$/, '')}/files`;
 
 			const headers = {
 					'Cookie': `ci_csrf_token=${csrfToken}`,
-					'apikey': credentials.apikey,
 					'kanbanize-integration': 'n8n',
 			};
 
@@ -278,12 +274,12 @@ export const attachmentHandlers: IResourceHandler = {
 			};
 
 			try {
-					const rawResponse = await this.helpers.httpRequest({
+					const rawResponse = await this.helpers.httpRequestWithAuthentication.call(this, 'businessmapApi', {
 							method: 'POST',
 							url: fileUploadUrl,
 							headers,
 							body: form,
-							json: false
+							json: false,
 					});
 
 					parsedResponse = rawResponse as any;
