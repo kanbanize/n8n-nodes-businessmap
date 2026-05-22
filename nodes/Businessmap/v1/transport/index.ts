@@ -64,8 +64,15 @@ export async function businessmapApiRequest(
 			options,
 		);
 
-		// pull out raw text (HTML or whatever)
-		const raw = response.body as string;
+		// axios may return a Buffer when json:false; coerce to string so JSON.parse works.
+		const raw =
+			Buffer.isBuffer(response.body)
+				? response.body.toString('utf8')
+				: typeof response.body === 'string'
+					? response.body
+					: response.body == null
+						? ''
+						: JSON.stringify(response.body);
 
 		// if it *is* JSON, parse it (or else leave it)
 		let data: any;
@@ -81,7 +88,7 @@ export async function businessmapApiRequest(
 				response as any,
 				{
 					message: `Request failed with status code ${response.statusCode}`,
-					description: data?.message || 'No further details available',
+					description: data?.error?.message || data?.message || raw || 'No further details available',
 				},
 			);
 		}

@@ -288,14 +288,24 @@ export async function getAttachments(this: ILoadOptionsFunctions): Promise<INode
     return [];
   }
 
-  const response = await businessmapApiRequest.call(
-    this,
-    'GET',
-    `/cards/${cardId}/attachments`,
-  );
+  // n8n re-fetches on every card_id keystroke, so partial IDs will 404.
+  // Surface those as an empty list rather than throwing, otherwise n8n caches
+  // the failure and never retries with the final value the user typed.
+  let response;
+  try {
+    response = await businessmapApiRequest.call(
+      this,
+      'GET',
+      `/cards/${cardId}/attachments`,
+    );
+  } catch {
+    return [];
+  }
 
   const attachments = response.data?.data;
-	checkApiResponse(this.getNode(), response, attachments, 'attachments');
+  if (!Array.isArray(attachments)) {
+    return [];
+  }
 
   return attachments.map((attachment: { file_name: string; id: number }) => ({
     name: attachment.file_name,
