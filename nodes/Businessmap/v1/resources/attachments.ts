@@ -244,13 +244,16 @@ export const attachmentHandlers: IResourceHandler = {
 					form.append('files[]', new Blob([Buffer.from(binaryData.data, BINARY_ENCODING)], {type: binaryData.mimeType}), filename);
 			}
 
-			// Helper function to convert stream to buffer
-			async function streamToBuffer(stream: Readable): Promise<Buffer> {
+			// Helper function to convert stream to buffer.
+			// Buffer.concat always allocates a fresh, non-shared ArrayBuffer, so narrowing
+			// the return type to Buffer<ArrayBuffer> is safe and makes the result usable
+			// as a BlobPart (which rejects SharedArrayBuffer-backed views).
+			async function streamToBuffer(stream: Readable): Promise<Buffer<ArrayBuffer>> {
 					return new Promise((resolve, reject) => {
 							const chunks: Buffer[] = [];
 							stream.on('data', (chunk) => chunks.push(chunk));
 							stream.on('error', reject);
-							stream.on('end', () => resolve(Buffer.concat(chunks)));
+							stream.on('end', () => resolve(Buffer.concat(chunks) as Buffer<ArrayBuffer>));
 					});
 			}
 
