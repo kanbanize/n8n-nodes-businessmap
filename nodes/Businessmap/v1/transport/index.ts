@@ -74,12 +74,20 @@ export async function businessmapApiRequest(
 						? ''
 						: JSON.stringify(response.body);
 
-		// if it *is* JSON, parse it (or else leave it)
+		// Empty bodies (e.g. 204 DELETE) must not become JSON `null`, or n8n output helpers break on null items.
+		const trimmed = raw.trim();
 		let data: any;
-		try {
-			data = JSON.parse(raw);
-		} catch {
-			data = null;
+		if (!trimmed) {
+			data = {};
+		} else {
+			try {
+				data = JSON.parse(trimmed);
+			} catch {
+				data = null;
+			}
+		}
+		if (data === null || data === undefined) {
+			data = {};
 		}
 
 		if (response.statusCode !== 200 && response.statusCode !== 204) {
