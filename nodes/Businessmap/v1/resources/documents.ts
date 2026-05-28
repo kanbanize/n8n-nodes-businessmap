@@ -556,19 +556,19 @@ export async function uploadBinaryToFilesApiV2(
 		);
 	}
 
+	// Subdomain is still needed to build the URL; the apikey header is injected by the
+	// credential's `authenticate` block via httpRequestWithAuthentication.
 	const credentials = (await this.getCredentials('businessmapApi')) as {
-		apikey: string;
 		subdomain: string;
 	};
 	const fileUploadUrl = `${credentials.subdomain.replace(/\/$/, '')}/api/v2/files`;
 	const headers: Record<string, string> = {
-		apikey: credentials.apikey,
 		'kanbanize-integration': 'n8n',
 	};
 
 	let parsedResponse: FilesV2UploadResponse;
 	try {
-		const raw = await this.helpers.httpRequest({
+		const raw = await this.helpers.httpRequestWithAuthentication.call(this, 'businessmapApi', {
 			method: 'POST',
 			url: fileUploadUrl,
 			headers,
