@@ -42,6 +42,12 @@ export const documentsOperations: INodeProperties[] = [
 				action: 'Update document',
 			},
 			{
+				name: 'Set Location',
+				value: 'setLocation',
+				description: 'Add the document to a card or a board',
+				action: 'Set document location',
+			},
+			{
 				name: 'Add Attachment',
 				value: 'addAttachment',
 				description: 'Upload a file and attach it to a document',
@@ -207,7 +213,63 @@ export const documentsFields: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['documents'],
-				operation: ['update', 'addAttachment'],
+				operation: ['update', 'setLocation', 'addAttachment'],
+			},
+		},
+	},
+	{
+		displayName: 'Card ID',
+		name: 'card_id',
+		type: 'number',
+		default: 0,
+		placeholder: 'e.g. 456',
+		description: 'Card to add the document to. Leave 0 to skip.',
+		displayOptions: {
+			show: {
+				resource: ['documents'],
+				operation: ['setLocation'],
+			},
+		},
+	},
+	{
+		displayName: 'Board Name or ID',
+		name: 'board_id',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		description: 'Board to add the document to. Leave empty to skip.',
+		modes: [
+			{
+				displayName: 'List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'searchBoards',
+					searchable: true,
+					searchFilterRequired: false,
+				},
+			},
+			{
+				displayName: 'Board ID',
+				name: 'id',
+				type: 'string',
+				hint: 'Enter the board ID',
+				placeholder: '123456',
+				validation: [
+					{
+						type: 'regex',
+						properties: {
+							regex: '^[0-9]+$',
+							errorMessage: 'Board ID must be numeric',
+						},
+					},
+				],
+				url: '={{ `https://${$credentials.subdomain}.businessmap.io/boards/${$value}` }}',
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['documents'],
+				operation: ['setLocation'],
 			},
 		},
 	},
@@ -677,5 +739,43 @@ export const documentHandlers: IResourceHandler = {
 			(isN8nBinaryData(binaryInput) ? trimmedString(binaryInput.fileName) : trimmedString(binaryInput));
 
 		return addAttachment.call(this, itemIndex, docId, binaryInput, filename);
+	},
+
+	setLocation: async function (this, itemIndex) {
+		let docId = this.getNodeParameter('doc_id', itemIndex) as number;
+		docId = Number(docId);
+
+		if (Number.isNaN(docId) || docId <= 0) {
+			throw new NodeOperationError(this.getNode(), 'Document ID must be a positive number', {
+				level: 'warning',
+			});
+		}
+
+		const cardId = parsePositiveInteger(this.getNodeParameter('card_id', itemIndex));
+		const boardId = coercePositiveBoardId(this.getNodeParameter('board_id', itemIndex));
+
+		if (cardId === undefined && boardId === undefined) {
+			throw new NodeOperationError(
+				this.getNode(),
+				'Provide a Card ID or a Board to add the document to',
+				{ level: 'warning' },
+			);
+		}
+
+		const body: IDataObject = {};
+		if (cardId !== undefined) {
+			body.card_ids_to_add = [cardId];
+		}
+		if (boardId !== undefined) {
+			body.boards_to_add_or_update = [{ board_id: boardId }];
+		}
+
+		const response = await businessmapApiRequest.call(
+			this,
+			'PATCH',
+			`/docs/${docId}/locations`,
+			body,
+		);
+		return response.data;
 	},
 };
