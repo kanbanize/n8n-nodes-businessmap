@@ -416,6 +416,18 @@ export async function archiveTypes(this: ILoadOptionsFunctions, filter?: string,
   };
 }
 
+export async function cardStateTypes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+	const cardStateTypes = [
+		{ name: 'Active', value: 'active' },
+		{ name: 'Archived', value: 'archived' },
+		{ name: 'Discarded', value: 'discarded' },
+	];
+
+	return {
+		results: cardStateTypes,
+	};
+}
+
 export async function getTags(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
 
   const response = await businessmapApiRequest.call(

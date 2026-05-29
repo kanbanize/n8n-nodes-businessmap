@@ -933,6 +933,56 @@ export const mainCardFields: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Card State',
+		name: 'state',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		description: 'Filter cards by their state',
+		modes: [
+			{
+				displayName: 'List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'cardStateTypes',
+					searchable: false,
+					searchFilterRequired: false,
+				},
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['mainCard'],
+				operation: ['getCustom'],
+			},
+		},
+	},
+	{
+		displayName: 'Card State',
+		name: 'state',
+		type: 'resourceLocator',
+		default: { mode: 'list', value: '' },
+		description: 'Filter cards by their state',
+		modes: [
+			{
+				displayName: 'List',
+				name: 'list',
+				type: 'list',
+				typeOptions: {
+					searchListMethod: 'cardStateTypes',
+					searchable: false,
+					searchFilterRequired: false,
+				},
+			},
+		],
+		displayOptions: {
+			show: {
+				resource: ['mainCard'],
+				operation: ['getAllCardsPerBoard'],
+			},
+		},
+	},
   /* -------------------------------------------------------------------------- */
   /*                                 Output                                     */
   /* -------------------------------------------------------------------------- */
@@ -1430,6 +1480,8 @@ export const mainCardHandlers: IResourceHandler = {
 		const cardIdentifier = this.getNodeParameter('card_id', itemIndex) as string;
 		const board   = this.getNodeParameter('board_id', itemIndex) as { value: number };
 		const boardId = board?.value;
+		const stateParam = this.getNodeParameter('state', itemIndex) as { value: string };
+		const state = stateParam?.value;
 
 		if (cardIdentifier === '') {
 			throw new NodeOperationError(this.getNode(), `Custom Card ID must not be empty`, {level: 'warning',});
@@ -1438,6 +1490,9 @@ export const mainCardHandlers: IResourceHandler = {
 		const qs: IDataObject = {};
 		if(boardId) {
 			qs.board_ids = boardId.toString();
+		}
+		if (state) {
+			qs.state = state;
 		}
 
 		qs.custom_ids = cardIdentifier;
@@ -1469,6 +1524,8 @@ export const mainCardHandlers: IResourceHandler = {
   getAllCardsPerBoard: async function (this, itemIndex) {
 		const board   = this.getNodeParameter('board_id', itemIndex) as { value: number };
 		let boardId = board?.value;
+		const stateParam = this.getNodeParameter('state', itemIndex) as { value: string };
+		const state = stateParam?.value;
 
 		boardId = Number(boardId);
 		if (Number.isNaN(boardId) || boardId === 0) {
@@ -1478,6 +1535,9 @@ export const mainCardHandlers: IResourceHandler = {
 		const qs: IDataObject = {};
 		if(boardId) {
 			qs.board_ids = boardId.toString();
+		}
+		if (state) {
+			qs.state = state;
 		}
 
 		const { fields, expand } = getSelectedFields.call(this, itemIndex);
