@@ -24,11 +24,11 @@ import { NodeApiError } from 'n8n-workflow';
  * @param body    - Request body; omitted from the request when empty.
  * @param qs      - Query-string parameters.
  * @param uri     - Override the full request URI; falls back to `<baseUrl><resource>`.
- * @param option  - Additional `IRequestOptions` fields merged into the request.
+ * @param option  - Additional `IHttpRequestOptions` fields merged into the request.
  * @returns Resolved response object with the following shape:
  *   - `statusCode` — HTTP status code returned by the API.
  *   - `headers`    — Response headers.
- *   - `data`       — Parsed JSON body, or `null` when the body is not JSON.
+ *   - `data`       — Parsed JSON body, or `{}` when the body is empty or not valid JSON.
  *   - `rawBody`    — Raw response body string.
  * @throws {NodeApiError} On non-200/204 status codes or network-level failures.
  */

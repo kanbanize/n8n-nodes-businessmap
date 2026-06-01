@@ -632,6 +632,7 @@ export async function addAttachment(
 	return attachResponse.data;
 }
 
+/** Operation handlers for the Documents resource. Each key matches an `operation` option value. */
 export const documentHandlers: IResourceHandler = {
 	get: async function (this, itemIndex) {
 		let docId = this.getNodeParameter('doc_id', itemIndex) as number;
