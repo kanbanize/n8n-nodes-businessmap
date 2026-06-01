@@ -48,8 +48,8 @@ The **Businessmap n8n community node** supports the following actions:
 * `Update Card`: Update the properties of a card (Title, Description, Priority, Size, Deadline, etc.).
 * `Move Card`: Move a card to a new column, lane or board.
 * `Get Card by ID`: Get the details of a card by its internal ID.
-* `Get Card by Custom Card ID`: Find card by custom card ID. If multiple cards are found, all will be returned. Use "Board" parameter to filter search by boards.
-* `Get All Cards Per Board`: Get all cards from a selected board. The response contains up to 200 cards. To retrieve more than 200 cards, please use pagination.
+* `Get Card by Custom Card ID`: Find card by custom card ID. If multiple cards are found, all will be returned. Use "Board" parameter to filter search by boards. Supports filtering by card state (active, archived, discarded).
+* `Get All Cards Per Board`: Get all cards from a selected board. The response contains up to 200 cards. To retrieve more than 200 cards, please use pagination. Supports filtering by card state (active, archived, discarded).
 * `Link Card`: Link a card to an existing card.
 * `Unlink Card`: Remove a link between two cards.
 * `Set Custom Fields`: Sets values of custom fields.

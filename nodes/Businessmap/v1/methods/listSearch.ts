@@ -416,7 +416,8 @@ export async function archiveTypes(this: ILoadOptionsFunctions, filter?: string,
   };
 }
 
-export async function cardStateTypes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/** Returns the static list of card state options: active, archived, or discarded. */
+export async function cardStateTypes(this: ILoadOptionsFunctions, _filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const cardStateTypes = [
 		{ name: 'Active', value: 'active' },
 		{ name: 'Archived', value: 'archived' },
