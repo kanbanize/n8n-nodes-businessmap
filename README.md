@@ -86,6 +86,12 @@ The **Businessmap n8n community node** supports the following actions:
 * `Get Sticker`: Get a sticker.
 * `Get All Stickers`: Get a list with all stickers.
 * `Assign Sticker`: Assign a sticker to a board.
+* `Create Document`: Create a new document with a title, content and optional flags.
+* `Get Document`: Get a single document by its ID.
+* `Get Board Documents`: Get all documents on a board.
+* `Update Document`: Update the title, content, or any of the document flags. Set Parent Doc ID to `0` to detach an existing parent. Leave Title or Content empty to keep the current value.
+* `Set Document Location`: Add a document to a card or a board.
+* `Add Attachment to Document`: Upload a file and attach it to a document.
 
 
 ## Credentials

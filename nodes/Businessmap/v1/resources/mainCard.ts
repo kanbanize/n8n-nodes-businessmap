@@ -1461,16 +1461,82 @@ export const mainCardHandlers: IResourceHandler = {
 			throw new NodeOperationError(this.getNode(), `Card ID must be a positive number`, {level: 'warning',});
 		}
 
+		const output = this.getNodeParameter('output', itemIndex) as 'simplified' | 'raw' | 'selected';
+
+		if (output === 'selected') {
+			const qs: IDataObject = {};
+			qs.card_ids = cardIdentifier;
+
+			const { fields, expand } = getSelectedFields.call(this, itemIndex);
+			if (fields !== '') {
+				qs.fields = fields;
+			}
+			if (expand !== '') {
+				qs.expand = expand;
+			}
+
+			const response = await businessmapApiRequest.call(
+				this,
+				'GET',
+				`/cards/`,
+				undefined,
+				qs,
+			);
+
+			// pull out the parsed JSON (response.data.data) and then its data array
+			// First `data` is from businessmapApiRequest, second is from Businessmap main `data` and third `data` are the actual cards
+			const items = response.data?.data?.data;
+			if (Array.isArray(items) && items.length > 0) {
+				return formatCardOutput.call(this, items, itemIndex).map(c => ({ ...c, state: 'active' }));
+			}
+
+			// Not found in the default (active) state — probe the single-card endpoint
+			// to detect whether the card exists in an archived/discarded state and retry.
+			const probeResponse = await businessmapApiRequest.call(
+				this,
+				'GET',
+				`/cards/${cardIdentifier}`,
+			);
+
+			const probeCard = probeResponse.data?.data;
+			if (probeCard && typeof probeCard === 'object' && !Array.isArray(probeCard)) {
+				let state: string | undefined;
+				if (probeCard.archived_at) {
+					state = 'archived';
+				} else if (probeCard.discarded_at) {
+					state = 'discarded';
+				}
+
+				if (state) {
+					qs.state = state;
+					const retryResponse = await businessmapApiRequest.call(
+						this,
+						'GET',
+						`/cards/`,
+						undefined,
+						qs,
+					);
+
+					const retryItems = retryResponse.data?.data?.data;
+					if (Array.isArray(retryItems) && retryItems.length > 0) {
+						return formatCardOutput.call(this, retryItems, itemIndex).map(c => ({ ...c, state }));
+					}
+				}
+			}
+
+			return {status: 'Card not found'};
+		}
+
 		const response = await businessmapApiRequest.call(
 			this,
 			'GET',
 			`/cards/${cardIdentifier}`,
-			undefined,
 		);
 
-		const item = response.data?.data;
-		if (item && typeof item === 'object' && !Array.isArray(item)) {
-			return formatCardOutput.call(this, [item], itemIndex);
+		const card = response.data?.data;
+		if (card && typeof card === 'object' && !Array.isArray(card) && Object.keys(card).length > 0) {
+			const state = card.archived_at ? 'archived' : card.discarded_at ? 'discarded' : 'active';
+			return formatCardOutput.call(this, [card], itemIndex).map(c => ({ ...c, state }));
 		}
 
 		return {status: 'Card not found'};
@@ -1515,7 +1581,23 @@ export const mainCardHandlers: IResourceHandler = {
 
 		const items = response.data?.data?.data;
 		if (Array.isArray(items) && items.length > 0) {
-			return formatCardOutput.call(this, items, itemIndex);
+			return formatCardOutput.call(this, items, itemIndex).map(c => ({ ...c, state: 'active' }));
+		}
+
+		// Not found in the default (active) state — retry against archived, then discarded.
+		for (const state of ['archived', 'discarded']) {
+			const retryResponse = await businessmapApiRequest.call(
+				this,
+				'GET',
+				'/cards/',
+				undefined,
+				{ ...qs, state },
+			);
+
+			const retryItems = retryResponse.data?.data?.data;
+			if (Array.isArray(retryItems) && retryItems.length > 0) {
+				return formatCardOutput.call(this, retryItems, itemIndex).map(c => ({ ...c, state }));
+			}
 		}
 
 		return {status: 'Card not found'};

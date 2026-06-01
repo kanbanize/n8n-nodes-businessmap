@@ -5,7 +5,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
 import { resourceOperations, resourceFields } from './ResourceDescriptions';
 import { resourceHandlers } from './ResourceHandler';
@@ -24,8 +24,8 @@ export class BusinessmapV1 implements INodeType {
 			name: 'Businessmap',
 		},
 		usableAsTool: true,
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'businessmapApi',
@@ -77,6 +77,11 @@ export class BusinessmapV1 implements INodeType {
 						value: 'stickers',
 						description: 'All sticker related actions'
 					},
+					{
+						name: 'Document',
+						value: 'documents',
+						description: 'All document related actions'
+					}
 				],
 				default: 'mainCard',
 			},

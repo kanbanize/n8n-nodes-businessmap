@@ -6,6 +6,7 @@ import { workspaceHandlers } from './resources/workspaces';
 import { boardHandlers } from './resources/boards';
 import { tagHandlers } from './resources/tags';
 import { stickerHandlers } from './resources/stickers';
+import { documentHandlers } from './resources/documents';
 
 export const resourceHandlers: IResourceHandlers = {
 	mainCard: mainCardHandlers,
@@ -15,4 +16,5 @@ export const resourceHandlers: IResourceHandlers = {
 	boards: boardHandlers,
 	tags: tagHandlers,
 	stickers: stickerHandlers,
+	documents: documentHandlers,
 };
