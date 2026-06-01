@@ -1,3 +1,10 @@
+/**
+ * @module transport
+ * HTTP transport layer for the Businessmap n8n node.
+ * Wraps the Businessmap REST API v2, handling authentication, request building,
+ * response normalisation, and error mapping to n8n's NodeApiError.
+ */
+
 import {
 	IDataObject,
 	IExecuteFunctions,
@@ -8,6 +15,23 @@ import {
 } from 'n8n-workflow';
 import { NodeApiError } from 'n8n-workflow';
 
+/**
+ * Executes an authenticated HTTP request against the Businessmap REST API v2.
+ *
+ * @param this    - n8n execution context (hook, execute, or load-options).
+ * @param method  - HTTP method (GET, POST, PATCH, DELETE, …).
+ * @param resource - API path appended to the base URL (e.g. `/cards`).
+ * @param body    - Request body; omitted from the request when empty.
+ * @param qs      - Query-string parameters.
+ * @param uri     - Override the full request URI; falls back to `<baseUrl><resource>`.
+ * @param option  - Additional `IRequestOptions` fields merged into the request.
+ * @returns Resolved response object with the following shape:
+ *   - `statusCode` — HTTP status code returned by the API.
+ *   - `headers`    — Response headers.
+ *   - `data`       — Parsed JSON body, or `null` when the body is not JSON.
+ *   - `rawBody`    — Raw response body string.
+ * @throws {NodeApiError} On non-200/204 status codes or network-level failures.
+ */
 export async function businessmapApiRequest(
   this: IHookFunctions | IExecuteFunctions | ILoadOptionsFunctions,
   method: IHttpRequestMethods,
