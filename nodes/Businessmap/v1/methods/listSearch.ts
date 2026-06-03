@@ -1,3 +1,11 @@
+/**
+ * @module listSearch
+ * n8n `listSearch` handler functions for resource-locator fields.
+ * Each function fetches data from the Businessmap REST API and returns
+ * a searchable option list. Optional client-side text filtering is applied
+ * after the API response is received.
+ */
+
 import type {
 	ILoadOptionsFunctions,
 	INodePropertyOptions,
@@ -8,7 +16,18 @@ import { NodeOperationError } from 'n8n-workflow';
 import { businessmapApiRequest } from '../transport';
 import { GetBoardDependentItemsParams, getBoardDependentItems, checkApiResponse } from '../helpers/utils';
 
-export async function searchWorkspaces(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns all non-archived workspaces as searchable options.
+ *
+ * Results are sorted alphabetically. Each option label is formatted as
+ * `"WorkspaceName (workspace_id)"`.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of workspaces.
+ */
+export async function searchWorkspaces(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 
   const response = await businessmapApiRequest.call(
     this,
@@ -40,7 +59,18 @@ export async function searchWorkspaces(this: ILoadOptionsFunctions, filter?: str
   };
 }
 
-export async function searchBoards(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns all non-archived boards as searchable options.
+ *
+ * Results are sorted alphabetically. Each option label is formatted as
+ * `"BoardName (board_id)"`.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of boards.
+ */
+export async function searchBoards(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 
   const response = await businessmapApiRequest.call(
     this,
@@ -72,7 +102,19 @@ export async function searchBoards(this: ILoadOptionsFunctions, filter?: string,
   };
 }
 
-export async function searchWorkflows(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns enabled workflows for the selected board as searchable options.
+ *
+ * Reads `board_id` from the node parameters. Workflows with `is_enabled === 0`
+ * are excluded from the results.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of enabled workflows.
+ * @throws {NodeOperationError} At `warning` level when `board_id` is not set.
+ */
+export async function searchWorkflows(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
   if (!boardId) {
@@ -111,7 +153,22 @@ export async function searchWorkflows(this: ILoadOptionsFunctions, filter?: stri
   };
 }
 
-export async function searchColumns(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns columns for the selected board and workflow as searchable options.
+ *
+ * Reads `board_id` from node parameters. For the `update` operation, `workflow_id`
+ * is resolved from `cardPositionFields.workflow_id.__rl` (a nested resource-locator
+ * field); for all other operations it is read from the top-level `workflow_id`
+ * parameter. Results are filtered client-side to columns belonging to the resolved
+ * workflow.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of columns for the workflow.
+ * @throws {NodeOperationError} At `warning` level when `board_id` or `workflow_id` is not set.
+ */
+export async function searchColumns(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 	const operation = this.getNodeParameter('operation', '') as string;
 
@@ -168,7 +225,21 @@ export async function searchColumns(this: ILoadOptionsFunctions, filter?: string
   };
 }
 
-export async function searchLanes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns lanes for the selected board and workflow as searchable options.
+ *
+ * Mirrors the `searchColumns` resolution logic: for the `update` operation,
+ * `workflow_id` is read from `cardPositionFields.workflow_id.__rl`; for all
+ * other operations it is read from the top-level `workflow_id` parameter.
+ * Results are filtered client-side to lanes belonging to the resolved workflow.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of lanes for the workflow.
+ * @throws {NodeOperationError} At `warning` level when `board_id` or `workflow_id` is not set.
+ */
+export async function searchLanes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 	const operation = this.getNodeParameter('operation', '') as string;
 
@@ -225,7 +296,19 @@ export async function searchLanes(this: ILoadOptionsFunctions, filter?: string, 
   };
 }
 
-export async function searchUsers(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns users assigned to the selected board as searchable options.
+ *
+ * Delegates to `getBoardDependentItems`, which performs a two-step fetch:
+ * first retrieves board user-role IDs, then resolves full user objects via
+ * `/users`. Requires `board_id` to be set.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of board users.
+ */
+export async function searchUsers(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
 	const params: GetBoardDependentItemsParams = {
@@ -251,7 +334,19 @@ export async function searchUsers(this: ILoadOptionsFunctions, filter?: string, 
   };
 }
 
-export async function searchTags(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns tags assigned to the selected board as searchable options.
+ *
+ * Delegates to `getBoardDependentItems`, which fetches board-scoped tag IDs
+ * then resolves full tag objects via `/tags`. Requires `board_id` to be set.
+ * For account-wide tags, use `getTags` instead.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of board-scoped tags.
+ */
+export async function searchTags(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
   const params: GetBoardDependentItemsParams = {
@@ -277,7 +372,19 @@ export async function searchTags(this: ILoadOptionsFunctions, filter?: string, p
   };
 }
 
-export async function searchStickers(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns stickers assigned to the selected board as searchable options.
+ *
+ * Delegates to `getBoardDependentItems`, which fetches board-scoped sticker IDs
+ * then resolves full sticker objects via `/stickers`. Requires `board_id` to be
+ * set. For account-wide stickers, use `getStickers` instead.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of board-scoped stickers.
+ */
+export async function searchStickers(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
   const params: GetBoardDependentItemsParams = {
@@ -303,7 +410,19 @@ export async function searchStickers(this: ILoadOptionsFunctions, filter?: strin
   };
 }
 
-export async function searchTypes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns card types available on the selected board as searchable options.
+ *
+ * Delegates to `getBoardDependentItems`, which fetches board-scoped card type IDs
+ * then resolves full card type objects via `/cardTypes`. Requires `board_id` to
+ * be set.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of card types for the board.
+ */
+export async function searchTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
   const params: GetBoardDependentItemsParams = {
@@ -329,7 +448,19 @@ export async function searchTypes(this: ILoadOptionsFunctions, filter?: string, 
   };
 }
 
-export async function searchTemplates(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns card templates available on the selected board as searchable options.
+ *
+ * Delegates to `getBoardDependentItems`, which fetches board-scoped template IDs
+ * then resolves full card template objects via `/cardTemplates`. Requires
+ * `board_id` to be set.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of card templates for the board.
+ */
+export async function searchTemplates(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
   const params: GetBoardDependentItemsParams = {
@@ -355,7 +486,19 @@ export async function searchTemplates(this: ILoadOptionsFunctions, filter?: stri
   };
 }
 
-export async function searchBlockReasons(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns block reasons available on the selected board as searchable options.
+ *
+ * Delegates to `getBoardDependentItems`, which fetches board-scoped block reason
+ * IDs then resolves full block reason objects via `/blockReasons`. Requires
+ * `board_id` to be set.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of block reasons for the board.
+ */
+export async function searchBlockReasons(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const boardId = this.getNodeParameter('board_id',	undefined, { extractValue: true },) as number;
 
   const params: GetBoardDependentItemsParams = {
@@ -381,7 +524,18 @@ export async function searchBlockReasons(this: ILoadOptionsFunctions, filter?: s
   };
 }
 
-export async function workspaceTypes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns a static list of workspace type options.
+ *
+ * No API call is made. Options: All Workspaces (-1), Team Workspaces (1),
+ * Management Workspaces (2).
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Accepted to satisfy the interface; not used (list is static).
+ * @param _paginationToken - Accepted to satisfy the interface; not used (list is static).
+ * @returns Static option list of workspace types.
+ */
+export async function workspaceTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const workspaceTypes = [
 		{ name: 'All Workspaces', value: -1 },
 		{ name: 'Team Workspaces', value: 1 },
@@ -393,7 +547,17 @@ export async function workspaceTypes(this: ILoadOptionsFunctions, filter?: strin
   };
 }
 
-export async function workspaceArchiveTypes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns a static list of workspace archive-state filter options.
+ *
+ * No API call is made. Options: All (-1), Non-Archived (0), Archived (1).
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Accepted to satisfy the interface; not used (list is static).
+ * @param _paginationToken - Accepted to satisfy the interface; not used (list is static).
+ * @returns Static option list of workspace archive states.
+ */
+export async function workspaceArchiveTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const workspaceArchiveTypes = [
 		{ name: 'All', value: -1 },
 		{ name: 'Non-Archived', value: 0 },
@@ -405,7 +569,17 @@ export async function workspaceArchiveTypes(this: ILoadOptionsFunctions, filter?
   };
 }
 
-export async function archiveTypes(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns a static list of archive-state options for cards or boards.
+ *
+ * No API call is made. Options: No (0), Yes (1).
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Accepted to satisfy the interface; not used (list is static).
+ * @param _paginationToken - Accepted to satisfy the interface; not used (list is static).
+ * @returns Static option list of archive states.
+ */
+export async function archiveTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const archiveTypes = [
 		{ name: 'No', value: 0 },
 		{ name: 'Yes', value: 1 },
@@ -416,8 +590,17 @@ export async function archiveTypes(this: ILoadOptionsFunctions, filter?: string,
   };
 }
 
-/** Returns the static list of card state options: active, archived, or discarded. */
-export async function cardStateTypes(this: ILoadOptionsFunctions, _filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns a static list of card state options.
+ *
+ * No API call is made. Options: Active, Archived, Discarded.
+ *
+ * @param this              - n8n load-options context.
+ * @param _filter           - Accepted to satisfy the interface; not used (list is static).
+ * @param _paginationToken  - Accepted to satisfy the interface; not used (list is static).
+ * @returns Static option list of card states.
+ */
+export async function cardStateTypes(this: ILoadOptionsFunctions, _filter?: string, __paginationToken?: string,): Promise<INodeListSearchResult> {
 	const cardStateTypes = [
 		{ name: 'Active', value: 'active' },
 		{ name: 'Archived', value: 'archived' },
@@ -429,7 +612,19 @@ export async function cardStateTypes(this: ILoadOptionsFunctions, _filter?: stri
 	};
 }
 
-export async function getTags(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns all tags across the account as searchable options.
+ *
+ * Unlike `searchTags`, this function is not scoped to a board — it fetches
+ * every tag in the account via `GET /tags`. Results are filtered client-side
+ * then sorted alphabetically by label.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of all account tags, sorted alphabetically.
+ */
+export async function getTags(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 
   const response = await businessmapApiRequest.call(
     this,
@@ -458,7 +653,19 @@ export async function getTags(this: ILoadOptionsFunctions, filter?: string, pagi
   };
 }
 
-export async function getStickers(this: ILoadOptionsFunctions, filter?: string, paginationToken?: string,): Promise<INodeListSearchResult> {
+/**
+ * Returns all stickers across the account as searchable options.
+ *
+ * Unlike `searchStickers`, this function is not scoped to a board — it fetches
+ * every sticker in the account via `GET /stickers`. Results are filtered
+ * client-side then sorted alphabetically by label.
+ *
+ * @param this            - n8n load-options context.
+ * @param filter          - Optional case-insensitive substring filter applied client-side.
+ * @param _paginationToken - Accepted to satisfy the interface; not used (API does not paginate).
+ * @returns Searchable option list of all account stickers, sorted alphabetically.
+ */
+export async function getStickers(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 
   const response = await businessmapApiRequest.call(
     this,
