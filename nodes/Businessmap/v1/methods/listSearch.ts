@@ -530,12 +530,12 @@ export async function searchBlockReasons(this: ILoadOptionsFunctions, filter?: s
  * No API call is made. Options: All Workspaces (-1), Team Workspaces (1),
  * Management Workspaces (2).
  *
- * @param this            - n8n load-options context.
- * @param filter          - Accepted to satisfy the interface; not used (list is static).
+ * @param this             - n8n load-options context.
+ * @param _filter          - Accepted to satisfy the interface; not used (list is static).
  * @param _paginationToken - Accepted to satisfy the interface; not used (list is static).
  * @returns Static option list of workspace types.
  */
-export async function workspaceTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
+export async function workspaceTypes(this: ILoadOptionsFunctions, _filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const workspaceTypes = [
 		{ name: 'All Workspaces', value: -1 },
 		{ name: 'Team Workspaces', value: 1 },
@@ -552,12 +552,12 @@ export async function workspaceTypes(this: ILoadOptionsFunctions, filter?: strin
  *
  * No API call is made. Options: All (-1), Non-Archived (0), Archived (1).
  *
- * @param this            - n8n load-options context.
- * @param filter          - Accepted to satisfy the interface; not used (list is static).
+ * @param this             - n8n load-options context.
+ * @param _filter          - Accepted to satisfy the interface; not used (list is static).
  * @param _paginationToken - Accepted to satisfy the interface; not used (list is static).
  * @returns Static option list of workspace archive states.
  */
-export async function workspaceArchiveTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
+export async function workspaceArchiveTypes(this: ILoadOptionsFunctions, _filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const workspaceArchiveTypes = [
 		{ name: 'All', value: -1 },
 		{ name: 'Non-Archived', value: 0 },
@@ -574,12 +574,12 @@ export async function workspaceArchiveTypes(this: ILoadOptionsFunctions, filter?
  *
  * No API call is made. Options: No (0), Yes (1).
  *
- * @param this            - n8n load-options context.
- * @param filter          - Accepted to satisfy the interface; not used (list is static).
+ * @param this             - n8n load-options context.
+ * @param _filter          - Accepted to satisfy the interface; not used (list is static).
  * @param _paginationToken - Accepted to satisfy the interface; not used (list is static).
  * @returns Static option list of archive states.
  */
-export async function archiveTypes(this: ILoadOptionsFunctions, filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
+export async function archiveTypes(this: ILoadOptionsFunctions, _filter?: string, _paginationToken?: string,): Promise<INodeListSearchResult> {
 	const archiveTypes = [
 		{ name: 'No', value: 0 },
 		{ name: 'Yes', value: 1 },
